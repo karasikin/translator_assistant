@@ -1,8 +1,16 @@
-#include <QCoreApplication>
+#include <QApplication>
+#include <QDebug>
 
-int main(int argc, char *argv[])
-{
-    QCoreApplication a(argc, argv);
+#include "clipboard.h"
 
-    return a.exec();
+int main(int argc, char *argv[]) {
+    QApplication app(argc, argv);
+
+    try{
+        qDebug() << *Clipboard::content();
+    } catch (...) {
+        qDebug() << "Что-то пошло не так";
+    }
+
+    return app.exec();
 }
