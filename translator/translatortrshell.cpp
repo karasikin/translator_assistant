@@ -6,14 +6,22 @@ TranslatorTrShell::TranslatorTrShell() {}
 
 string_ptr TranslatorTrShell::translate(string_ptr src) {
     QProcess trShell;
+    QString response{};
+    QStringList args{};
+
+    args << "-no-ansi" << *src;
+    if(src->contains(' ')) {
+        args << "-brief";
+    }
 
     trShell.setReadChannel(QProcess::ProcessChannel::StandardOutput);
-
-    trShell.start(PROGRAM, QStringList() << *src, QIODevice::ReadOnly);
+    trShell.start(PROGRAM, args, QIODevice::ReadOnly);
 
     if(trShell.waitForReadyRead(TIMEOUT_MS)) {
-        return std::make_unique<QString>(QString(trShell.readAllStandardOutput()));
-    } else {
-        return std::make_unique<QString>();
+        response = QString(trShell.readAllStandardOutput());
     }
+
+    trShell.close();
+
+    return std::make_unique<QString>(std::move(response));
 }

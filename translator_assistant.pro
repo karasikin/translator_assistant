@@ -11,7 +11,8 @@ INCLUDEPATH = translator/
 SOURCES += \
         clipboard.cpp \
         main.cpp \
-        translator/translatortrshell.cpp
+        translator/translatortrshell.cpp \
+        window.cpp
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -21,4 +22,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 HEADERS += \
     clipboard.h \
     translator/i_translator.h \
-    translator/translatortrshell.h
+    translator/translatortrshell.h \
+    window.h
