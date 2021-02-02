@@ -6,8 +6,14 @@
 #include "clipboard.h"
 #include "translatortrshell.h"
 #include "window.h"
+#include "blocker.h"
 
 int main(int argc, char *argv[]) {
+    Blocker blocker{"trAssistant"};
+    if(!blocker.isThisProcessFirst()) {
+        return 0;
+    }
+
     QApplication app{argc, argv};
 
     Window window{};
