@@ -24,6 +24,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     clipboard.h \
+    main.h \
     translator/i_translator.h \
     translator/translatortrshell.h \
     blocker/blocker.h \
