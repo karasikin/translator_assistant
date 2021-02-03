@@ -2,12 +2,15 @@
 
 #include <QProcess>
 
-TranslatorTrShell::TranslatorTrShell() {}
+TranslatorTrShell::TranslatorTrShell()
+    : PROGRAM("/usr/bin/truns"),
+      TIMEOUT_MS(5000)
+{}
 
 string_ptr TranslatorTrShell::translate(string_ptr src) {
     QProcess trShell;
-    QString response{};
-    QStringList args{};
+    QString response;
+    QStringList args;
 
     args << "-no-ansi" << *src;
     if(src->contains(' ')) {

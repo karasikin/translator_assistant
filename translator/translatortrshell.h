@@ -7,8 +7,8 @@
 
 class TranslatorTrShell : public ITranslator {
 public:
-    const QString PROGRAM = "/usr/bin/trans";
-    const int TIMEOUT_MS = 5000;
+    const QString PROGRAM;
+    const int TIMEOUT_MS;
 
 public:
     TranslatorTrShell();

@@ -9,8 +9,6 @@
 #include "translatortrshell.h"
 #include "blocker.h"
 
-class Window;
-
 using string_ptr = std::unique_ptr<QString>;
 
 class Main : public QObject {
@@ -23,14 +21,15 @@ public:
     void run();
 
 private slots:
-    void translate();
+    void translateClipboard();
+    void translate(QString source);
 
 signals:
     void needQuit();
 
 private:
     Window window;
-    TranslatorTrShell trSell;
+    TranslatorTrShell trShell;
     Blocker blocker;
 
 };

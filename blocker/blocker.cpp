@@ -13,7 +13,9 @@ std::string Blocker::uniqueItemsName{"/default_blocking_items_name"};
 std::function<void()> Blocker::collback = nullptr;
 
 Blocker::Blocker(const std::string &unique_name)
-    : isIFirst(true)
+    : isIFirst(true),
+      quitSigaction(),
+      nonFirstProcessSigaction()
 {
     uniqueItemsName = "/" + unique_name;
 
