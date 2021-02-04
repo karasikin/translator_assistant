@@ -97,7 +97,18 @@ void Window::onTranslateBtnClicked() {
 }
 
 void Window::onExchangeLanguageBtnClicked() {
-    qDebug() << "Exchange btn clicked";
+    QString tmp = std::move(currentDstLang);
+    currentDstLang = std::move(currentSrcLang);
+    currentSrcLang = std::move(tmp);
+
+    srcLanguageComboBox->setCurrentText(currentSrcLang);
+    destLanguageComboBox->setCurrentText(currentDstLang);
+
+    tmp = translatedTextEdit->toPlainText();
+    translatedTextEdit->setPlainText(sourceTextEdit->toPlainText());
+    sourceTextEdit->setPlainText(tmp);
+
+    emit needTranslateSourceText(tmp, currentSrcLang, currentDstLang);
 }
 
 void Window::onSourceEditChanged() {
