@@ -28,4 +28,5 @@ HEADERS += \
     translator/i_translator.h \
     translator/translatortrshell.h \
     blocker/blocker.h \
+    translator/trcreator.h \
     window.h

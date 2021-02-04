@@ -1,14 +1,16 @@
 #include "main.h"
 
 #include <QApplication>
+#include <QDebug>
 
 #include "clipboard.h"
+#include "trcreator.h"
 
 
 Main::Main()
     : window(),
-      trShell(),
-      blocker("unique_name_my_www")
+      blocker("unique_name_my_www"),
+      translator(nullptr)
 {
     QObject::connect(this, &Main::needQuit, qApp, &QApplication::quit, Qt::QueuedConnection);
 }
@@ -25,6 +27,9 @@ void Main::run() {
 
     // Other options ...
 
+    translator = TrCreator::create();
+    supportedLanguages = translator->getSupportedLanguages();
+
     QObject::connect(&window, &Window::needTranslateSourceText, this, &Main::translate);
     QObject::connect(&window, &Window::needTranslateClipboard, this, &Main::translateClipboard);
 
@@ -39,7 +44,7 @@ void Main::translateClipboard() {
     auto text_ptr = Clipboard::content();
     if(!text_ptr->isEmpty()) {
         window.updateSourceText(*text_ptr);
-        text_ptr = trShell.translate(std::move(text_ptr));
+        text_ptr = translator->translate(std::move(text_ptr));
         window.updateTranslatedText(*text_ptr);
     }
 }
@@ -54,7 +59,8 @@ void Main::translate(QString source) {
         // ...................
         // На сколько я понял тип ссылки rvalue(lvalue) определяется типом параметра
 
-        auto text_ptr = trShell.translate(std::make_unique<QString>(std::move(source)));
+        auto text_ptr = translator->translate(std::make_unique<QString>(std::move(source)));
+
         window.updateTranslatedText(*text_ptr);
     }
 }

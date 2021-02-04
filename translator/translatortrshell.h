@@ -2,6 +2,7 @@
 #define TRANSLATORTRSHELL_H
 
 #include <QStringList>
+#include <QMap>
 
 #include "i_translator.h"
 
@@ -14,7 +15,10 @@ public:
     TranslatorTrShell();
 
     string_ptr translate(string_ptr src) override;
+    QStringList getSupportedLanguages() override;
 
+private:
+    QMap<QString, QString> supportedLanguages;
 
 };
 

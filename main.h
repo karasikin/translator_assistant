@@ -6,8 +6,8 @@
 #include <QObject>
 
 #include "window.h"
-#include "translatortrshell.h"
 #include "blocker.h"
+#include "i_translator.h"
 
 using string_ptr = std::unique_ptr<QString>;
 
@@ -29,9 +29,11 @@ signals:
 
 private:
     Window window;
-    TranslatorTrShell trShell;
     Blocker blocker;
 
+    std::unique_ptr<ITranslator> translator;
+
+    QStringList supportedLanguages;
 };
 
 #endif // MAIN_H

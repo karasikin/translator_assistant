@@ -120,8 +120,6 @@ void Blocker::quitSignalHandler(int id) {
     }
 }
 
-#include <iostream>
-
 void Blocker::nonFirstProcessSignalHandler(int id) {
     if(collback != nullptr && id == SIGUSR1) {
         collback();

@@ -2,10 +2,19 @@
 
 #include <QProcess>
 
+
 TranslatorTrShell::TranslatorTrShell()
-    : PROGRAM("/usr/bin/truns"),
+    : PROGRAM("/usr/bin/trans"),
       TIMEOUT_MS(5000)
-{}
+{
+
+    // Заприосить список языков и поместить в supportedLanguages!!!
+
+    supportedLanguages = {
+        {"Russian", "ru"},
+        {"Englesh", "en"}
+    };
+}
 
 string_ptr TranslatorTrShell::translate(string_ptr src) {
     QProcess trShell;
@@ -27,4 +36,8 @@ string_ptr TranslatorTrShell::translate(string_ptr src) {
     trShell.close();
 
     return std::make_unique<QString>(std::move(response));
+}
+
+QStringList TranslatorTrShell::getSupportedLanguages() {
+    return supportedLanguages.keys();
 }
