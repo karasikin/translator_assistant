@@ -5,22 +5,46 @@
 #include <QPushButton>
 #include <QGridLayout>
 
+#include "i_translator.h"
+
 #include <QDebug>
 
-Window::Window(QWidget *parent)
-    : QWidget(parent),
-      isSourceEditChanged(false),
-      sourceTextEdit(new QPlainTextEdit),
-      translatedTextEdit(new QPlainTextEdit),
-      srcLanguageComboBox(new QComboBox),
-      destLanguageComboBox(new QComboBox),
-      translatePushButton(new QPushButton{"Translate"})
+Window::Window(const ITranslator &translator, QWidget *parent)
+  : QWidget(parent),
+    isSourceEditChanged(false),
+    sourceTextEdit(new QPlainTextEdit),
+    translatedTextEdit(new QPlainTextEdit),
+    srcLanguageComboBox(new QComboBox),
+    destLanguageComboBox(new QComboBox),
+    translatePushButton(new QPushButton{"&Translate"}),
+    exchangeLanguageButton(new QPushButton)
 {
+    auto supportedLanguages = translator.getSupportedLanguages();
+    srcLanguageComboBox->addItems(supportedLanguages);
+    destLanguageComboBox->addItems(supportedLanguages);
+    srcLanguageComboBox->setCurrentText(translator.getDefaultSourceLanguage());
+    destLanguageComboBox->setCurrentText(translator.getDefaultDestinationLanguage());
+
+    currentSrcLang = srcLanguageComboBox->currentText();
+    currentDstLang = destLanguageComboBox->currentText();
+
     customizingWidgets();
     createLayout();
 
     QObject::connect(translatePushButton, &QPushButton::clicked, this, &Window::onTranslateBtnClicked);
+    QObject::connect(exchangeLanguageButton, &QPushButton::clicked, this, &Window::onExchangeLanguageBtnClicked);
     QObject::connect(sourceTextEdit, &QPlainTextEdit::textChanged, this, &Window::onSourceEditChanged);
+    QObject::connect(srcLanguageComboBox, &QComboBox::currentTextChanged, this, &Window::onSrcLangChanged);
+    QObject::connect(destLanguageComboBox, &QComboBox::currentTextChanged, this, &Window::onDstLangChanged);
+
+}
+
+const QString &Window::getCurrentSrcLang() const {
+    return currentSrcLang;
+}
+
+const QString &Window::getCurrentDstLang() const {
+    return currentDstLang;
 }
 
 void Window::updateText(const QString &sourceText, const QString &translatedText) {
@@ -53,10 +77,11 @@ void Window::customizingWidgets() {
 void Window::createLayout() {
     auto layout = new QGridLayout;
 
-    layout->addWidget(srcLanguageComboBox, 0, 0);
-    layout->addWidget(destLanguageComboBox, 0, 10);
+    layout->addWidget(srcLanguageComboBox, 0, 0, Qt::AlignLeft);
+    layout->addWidget(destLanguageComboBox, 0, 20, Qt::AlignRight);
+    layout->addWidget(exchangeLanguageButton, 0, 9, 1, 3);
     layout->addWidget(sourceTextEdit, 1, 0, 10, 10);
-    layout->addWidget(translatedTextEdit, 1, 10, 10, 10);
+    layout->addWidget(translatedTextEdit, 1, 11, 10, 10);
     layout->addWidget(translatePushButton, 11, 0);
 
     setLayout(layout);
@@ -64,13 +89,27 @@ void Window::createLayout() {
 
 void Window::onTranslateBtnClicked() {
     if(!isSourceEditChanged) {
-        emit needTranslateClipboard();
+        emit needTranslateClipboard(currentSrcLang, currentDstLang);
         return;
     }
 
-    emit needTranslateSourceText(sourceTextEdit->toPlainText());
+    emit needTranslateSourceText(sourceTextEdit->toPlainText(), currentSrcLang, currentDstLang);
+}
+
+void Window::onExchangeLanguageBtnClicked() {
+    qDebug() << "Exchange btn clicked";
 }
 
 void Window::onSourceEditChanged() {
+    isSourceEditChanged = true;
+}
+
+void Window::onSrcLangChanged(const QString &text) {
+    currentSrcLang = text;
+    isSourceEditChanged = true;
+}
+
+void Window::onDstLangChanged(const QString &text) {
+    currentDstLang = text;
     isSourceEditChanged = true;
 }

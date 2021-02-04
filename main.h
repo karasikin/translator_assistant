@@ -21,19 +21,17 @@ public:
     void run();
 
 private slots:
-    void translateClipboard();
-    void translate(QString source);
+    void translateClipboard(const QString &srcLang, const QString &dstLang);
+    void translate(QString source, const QString &srdLang, const QString &dstLang);
 
 signals:
     void needQuit();
 
 private:
-    Window window;
     Blocker blocker;
 
+    std::unique_ptr<Window> window;
     std::unique_ptr<ITranslator> translator;
-
-    QStringList supportedLanguages;
 };
 
 #endif // MAIN_H

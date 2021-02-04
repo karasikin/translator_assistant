@@ -8,8 +8,8 @@
 
 
 Main::Main()
-    : window(),
-      blocker("unique_name_my_www"),
+    : blocker("unique_name_my_www"),
+      window(nullptr),
       translator(nullptr)
 {
     QObject::connect(this, &Main::needQuit, qApp, &QApplication::quit, Qt::QueuedConnection);
@@ -21,35 +21,36 @@ void Main::run() {
         return;
     }
 
-    blocker.setCollback([this]() {
-        this->translateClipboard();
-    });
 
-    // Other options ...
+    // Options ...
 
     translator = TrCreator::create();
-    supportedLanguages = translator->getSupportedLanguages();
+    window = std::make_unique<Window>(*translator);
 
-    QObject::connect(&window, &Window::needTranslateSourceText, this, &Main::translate);
-    QObject::connect(&window, &Window::needTranslateClipboard, this, &Main::translateClipboard);
+    blocker.setCollback([this]() {
+        this->translateClipboard(this->window->getCurrentSrcLang(), this->window->getCurrentDstLang());
+    });
+
+    QObject::connect(window.get(), &Window::needTranslateSourceText, this, &Main::translate);
+    QObject::connect(window.get(), &Window::needTranslateClipboard, this, &Main::translateClipboard);
 
     // .................
 
 
-    window.show();
-    translateClipboard();
+    window->show();
+    translateClipboard(window->getCurrentSrcLang(), window->getCurrentDstLang());
 }
 
-void Main::translateClipboard() {
+void Main::translateClipboard(const QString &srcLang, const QString &dstLang) {
     auto text_ptr = Clipboard::content();
     if(!text_ptr->isEmpty()) {
-        window.updateSourceText(*text_ptr);
-        text_ptr = translator->translate(std::move(text_ptr));
-        window.updateTranslatedText(*text_ptr);
+        window->updateSourceText(*text_ptr);
+        text_ptr = translator->translate(std::move(text_ptr), srcLang, dstLang);
+        window->updateTranslatedText(*text_ptr);
     }
 }
 
-void Main::translate(QString source) {
+void Main::translate(QString source, const QString &srcLang, const QString &dstLang) {
     if(!source.isEmpty()) {
 
         // Выдержка из cppreference
@@ -59,9 +60,9 @@ void Main::translate(QString source) {
         // ...................
         // На сколько я понял тип ссылки rvalue(lvalue) определяется типом параметра
 
-        auto text_ptr = translator->translate(std::make_unique<QString>(std::move(source)));
+        auto text_ptr = translator->translate(std::make_unique<QString>(std::move(source)), srcLang, dstLang);
 
-        window.updateTranslatedText(*text_ptr);
+        window->updateTranslatedText(*text_ptr);
     }
 }
 
